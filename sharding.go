@@ -360,9 +360,10 @@ func (s *Sharding) resolve(query string, args ...interface{}) (ftQuery, stQuery,
 					}
 				}
 				if fillID {
-					tblIdx, err := strconv.Atoi(strings.Replace(suffix, "_", "", 1))
+					suffixWords := strings.Replace(suffix, "_", "", 1)
+					tblIdx, err := strconv.Atoi(suffixWords)
 					if err != nil {
-						return ftQuery, stQuery, tableName, err
+						tblIdx = int(crc32.ChecksumIEEE([]byte(suffixWords))) % int(r.NumberOfShards)
 					}
 					id := r.PrimaryKeyGeneratorFn(int64(tblIdx))
 					columnNames = append(insertNames, &sqlparser.Ident{Name: "id"})
